@@ -38,7 +38,8 @@ ANTHROPIC_API_KEY=your_claude_key_here
 | GET | `/health` | Health check |
 | POST | `/crawl` | Trigger BFS crawl of a SaaS product |
 | GET | `/graph` | Return knowledge graph (all products or by `product_id`) |
-| GET | `/drift` | Drift detection (Week 2 stub) |
+| GET | `/drift` | Run drift detection against stored baselines |
+| GET | `/drift/logs` | List recent drift events |
 | POST | `/demo` | Demo generation (Week 4 stub) |
 
 ## Example: Crawl a Product

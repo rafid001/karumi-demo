@@ -19,8 +19,15 @@ class ScreenshotService:
         path.write_bytes(data)
         return str(path)
 
-    def get_path(self, screenshot_path: str) -> Path:
-        return Path(screenshot_path)
+    def path_for_drift(self, product_id: uuid.UUID, node_id: uuid.UUID) -> Path:
+        drift_dir = self.base_dir / str(product_id) / "drift"
+        drift_dir.mkdir(parents=True, exist_ok=True)
+        return drift_dir / f"{node_id}.png"
+
+    def save_drift_bytes(self, product_id: uuid.UUID, node_id: uuid.UUID, data: bytes) -> str:
+        path = self.path_for_drift(product_id, node_id)
+        path.write_bytes(data)
+        return str(path)
 
     def exists(self, screenshot_path: str) -> bool:
         return Path(screenshot_path).exists()

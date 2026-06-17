@@ -1,0 +1,9 @@
+{
+  "name": "demo-agent-scripts",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0"
+  }
+}

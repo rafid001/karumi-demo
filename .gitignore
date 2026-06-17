@@ -5,7 +5,11 @@ __pycache__/
 .venv/
 venv/
 screenshots/
+node_modules/
+package-lock.json
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 *.png
+context.md
+package-lock.json
