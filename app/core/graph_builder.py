@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
@@ -103,6 +104,31 @@ class GraphBuilder:
         self.db.add(edge)
         self.db.flush()
         return edge
+
+    def get_neighbor_node_ids(self, node_id: uuid.UUID) -> list[uuid.UUID]:
+        outgoing = self.db.query(Edge.to_node_id).filter(Edge.from_node_id == node_id).all()
+        incoming = self.db.query(Edge.from_node_id).filter(Edge.to_node_id == node_id).all()
+        neighbor_ids = {row[0] for row in outgoing} | {row[0] for row in incoming}
+        neighbor_ids.discard(node_id)
+        return list(neighbor_ids)
+
+    def get_subgraph(self, node_ids: list[uuid.UUID]) -> dict:
+        if not node_ids:
+            return {"nodes": [], "edges": []}
+
+        id_set = set(node_ids)
+        nodes = self.db.query(Node).filter(Node.id.in_(id_set)).all()
+        edges = (
+            self.db.query(Edge)
+            .filter(Edge.from_node_id.in_(id_set), Edge.to_node_id.in_(id_set))
+            .all()
+        )
+        product_id = str(nodes[0].product_id) if nodes else None
+        return {
+            "product_id": product_id,
+            "nodes": [self._serialize_node(n) for n in nodes],
+            "edges": [self._serialize_edge(e) for e in edges],
+        }
 
     def get_graph(self, product_id: uuid.UUID) -> dict:
         nodes = self.db.query(Node).filter(Node.product_id == product_id).all()

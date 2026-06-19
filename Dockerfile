@@ -16,7 +16,11 @@ RUN npm install --omit=dev
 
 RUN playwright install --with-deps chromium
 
+COPY dashboard/package.json dashboard/
+RUN cd dashboard && npm install --omit=dev
+
 COPY . .
+RUN cd dashboard && npm run build
 
 RUN mkdir -p screenshots
 

@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     screenshot_dir: str = "./screenshots"
     drift_check_interval_hours: int = 6
     drift_visual_threshold: float = 0.05
+    auto_heal_on_drift: bool = True
     playwright_headless: bool = True
     crawl_max_pages: int = 50
     crawl_max_depth: int = 5

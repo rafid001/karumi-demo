@@ -3,7 +3,9 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.core.drift_detector import DriftDetector
+from app.core.healer import Healer, drift_log_needs_healing, parse_semantic_diff
 from app.db.session import get_db
 from app.models.drift_log import DriftLog
 from app.models.node import Node
@@ -15,6 +17,7 @@ router = APIRouter(prefix="/drift", tags=["drift"])
 def run_drift_detection(
     product_id: str | None = Query(None, description="Limit drift check to one product"),
     threshold: float | None = Query(None, description="Visual diff threshold (0-1)"),
+    auto_heal: bool | None = Query(None, description="Auto-heal meaningful drift after detection"),
     db: Session = Depends(get_db),
 ):
     if product_id:
@@ -29,7 +32,15 @@ def run_drift_detection(
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Drift detection failed: {exc}") from exc
 
-    return DriftDetector.serialize_result(result)
+    response = DriftDetector.serialize_result(result)
+
+    should_heal = auto_heal if auto_heal is not None else settings.auto_heal_on_drift
+    if should_heal and result.nodes_meaningful > 0:
+        healer = Healer(db)
+        healing = healer.heal_all_pending()
+        response["healing"] = Healer.serialize_batch(healing)
+
+    return response
 
 
 @router.get("/logs")
@@ -58,6 +69,7 @@ def list_drift_logs(
                 "detected_at": log.detected_at.isoformat() if log.detected_at else None,
                 "visual_diff_score": log.visual_diff_score,
                 "semantic_diff": log.semantic_diff,
+                "needs_healing": drift_log_needs_healing(log) if not log.healed else False,
                 "healed": log.healed,
                 "healed_at": log.healed_at.isoformat() if log.healed_at else None,
             }

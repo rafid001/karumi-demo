@@ -112,6 +112,8 @@ class DriftDetector:
 
                 semantic = self._semantic_diff(node.screenshot_path, fresh_path, score)
                 is_meaningful = self._is_meaningful(semantic)
+                semantic["is_meaningful"] = is_meaningful
+                semantic["needs_healing"] = is_meaningful
 
                 drift_log = DriftLog(
                     node_id=node.id,
