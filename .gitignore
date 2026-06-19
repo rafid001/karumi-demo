@@ -10,6 +10,5 @@ package-lock.json
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-*.png
 context.md
 package-lock.json
