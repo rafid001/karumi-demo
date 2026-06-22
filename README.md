@@ -150,9 +150,3 @@ DATABASE_URL=postgresql://user:password@localhost:5432/demo_agent
 ```
 
 ---
-
-## Built by
-
-Rafid — SWE at Visa, building in the AI agent space independently.
-
-[LinkedIn](https://linkedin.com/in/hasan-rafid/)
